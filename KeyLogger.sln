@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.1062
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "KeyLogger", "KeyLogger\KeyLogger.vcxproj", "{18051BCD-149C-4659-920B-0B31DE14428A}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LogServer", "KeyLogger\KeyLogger.vcxproj", "{18051BCD-149C-4659-920B-0B31DE14428A}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "KeyLogger", "KeyLogger(Client)\KeyLogger(Client).vcxproj", "{6933DC31-7659-4B11-B443-6FEF7BACB505}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,14 @@ Global
 		{18051BCD-149C-4659-920B-0B31DE14428A}.Release|x64.Build.0 = Release|x64
 		{18051BCD-149C-4659-920B-0B31DE14428A}.Release|x86.ActiveCfg = Release|Win32
 		{18051BCD-149C-4659-920B-0B31DE14428A}.Release|x86.Build.0 = Release|Win32
+		{6933DC31-7659-4B11-B443-6FEF7BACB505}.Debug|x64.ActiveCfg = Debug|x64
+		{6933DC31-7659-4B11-B443-6FEF7BACB505}.Debug|x64.Build.0 = Debug|x64
+		{6933DC31-7659-4B11-B443-6FEF7BACB505}.Debug|x86.ActiveCfg = Debug|Win32
+		{6933DC31-7659-4B11-B443-6FEF7BACB505}.Debug|x86.Build.0 = Debug|Win32
+		{6933DC31-7659-4B11-B443-6FEF7BACB505}.Release|x64.ActiveCfg = Release|x64
+		{6933DC31-7659-4B11-B443-6FEF7BACB505}.Release|x64.Build.0 = Release|x64
+		{6933DC31-7659-4B11-B443-6FEF7BACB505}.Release|x86.ActiveCfg = Release|Win32
+		{6933DC31-7659-4B11-B443-6FEF7BACB505}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
