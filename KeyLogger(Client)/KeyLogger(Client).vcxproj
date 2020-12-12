@@ -124,13 +124,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="FileService.cpp" />
     <ClCompile Include="Keylogger.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="TcpClient.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="FileService.h" />
     <ClInclude Include="Keylogger.h" />
     <ClInclude Include="TcpClient.h" />
   </ItemGroup>

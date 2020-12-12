@@ -1,9 +1,11 @@
 #include "TcpClient.h"
 
-TcpClient::TcpClient(std::wstring ipAddr, std::wstring port)
+TcpClient::TcpClient(std::wstring ipAddr, std::wstring port, int buffSize)
 {
 	this->ipAddr = ipAddr;
 	this->port = port;
+	if (buffSize > 0)
+		this->innerBuffSize = buffSize;
 }
 
 BOOLEAN TcpClient::Connect(std::wstring ipAddr, std::wstring port)
@@ -54,5 +56,57 @@ BOOLEAN TcpClient::Connect(std::wstring ipAddr, std::wstring port)
 	}
 
 	this->connectionSocket = connectSocket;
+	this->connectionStatus = TRUE;
 	return TRUE;
+}
+
+void TcpClient::Disconnect()
+{
+	this->FlushStream();
+	closesocket(this->connectionSocket);
+	this->connectionSocket = INVALID_SOCKET;
+	this->connectionStatus = FALSE;
+	WSACleanup();
+}
+
+BOOLEAN TcpClient::SendBuff(std::wstring buff)
+{
+	if (buff.empty())
+		return FALSE;
+
+	this->outStream << buff;
+	this->bytesInStream += buff.length();
+	if (this->bytesInStream > this->innerBuffSize)
+		return this->FlushStream();
+	return TRUE;
+}
+
+BOOLEAN TcpClient::FlushStream()
+{
+	if (this->connectionStatus)
+	{
+		this->outStream << L"\0";
+		this->bytesInStream++;
+		int result = send(this->connectionSocket, (const char*)this->outStream.str().c_str(), this->bytesInStream * sizeof(wchar_t), 0);
+		if (result == SOCKET_ERROR)
+		{
+			this->connectionStatus = FALSE;
+			this->hReconnectionThread = (HANDLE)_beginthreadex(NULL, 0, this->ReconnectionThreadRoutine, this, 0, NULL);
+			return FALSE;
+		}
+		this->bytesInStream = 0;
+		this->outStream.str(L"");
+		return TRUE;
+	}
+	return FALSE;
+}
+
+unsigned TcpClient::ReconnectionThreadRoutine(void* instance)
+{
+	TcpClient *client = (TcpClient *)instance;
+	while (!client->Connect(L"", L""))
+		Sleep(1000);
+	client->connectionStatus = TRUE;
+	CloseHandle(client->hReconnectionThread);
+	return 0;
 }
