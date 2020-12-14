@@ -24,12 +24,24 @@
     <ClCompile Include="TcpClient.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="Concealment.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="Filters.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Keylogger.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="TcpClient.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Concealment.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Filters.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>

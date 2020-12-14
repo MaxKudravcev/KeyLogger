@@ -124,11 +124,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Concealment.cpp" />
+    <ClCompile Include="Filters.cpp" />
     <ClCompile Include="Keylogger.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="TcpClient.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Concealment.h" />
+    <ClInclude Include="Filters.h" />
     <ClInclude Include="Keylogger.h" />
     <ClInclude Include="TcpClient.h" />
   </ItemGroup>

