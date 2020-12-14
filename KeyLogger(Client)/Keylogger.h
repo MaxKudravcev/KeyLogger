@@ -26,5 +26,6 @@ private:
 	static const std::vector<std::vector<BYTE>> keySets;
 	static const std::vector<std::wstring> specialKeyNames;
 	static BYTE keyState[256];
+	static std::wstring previousWindowTitle;
 };
 

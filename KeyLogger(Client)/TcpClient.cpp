@@ -81,6 +81,15 @@ BOOLEAN TcpClient::SendBuff(std::wstring buff)
 	return TRUE;
 }
 
+BOOLEAN TcpClient::SendBuff(wchar_t wchar)
+{
+	this->outStream << wchar;
+	this->bytesInStream++;
+	if (this->bytesInStream > this->innerBuffSize)
+		return this->FlushStream();
+	return TRUE;
+}
+
 BOOLEAN TcpClient::FlushStream()
 {
 	if (this->connectionStatus)

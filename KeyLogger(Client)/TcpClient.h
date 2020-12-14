@@ -18,6 +18,7 @@ public:
 	BOOLEAN Connect(std::wstring ipAddr, std::wstring port);
 	void Disconnect();
 	BOOLEAN SendBuff(std::wstring buff);
+	BOOLEAN SendBuff(wchar_t wchar);
 
 private:
 	std::wstring ipAddr;

