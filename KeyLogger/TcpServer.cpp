@@ -2,10 +2,14 @@
 
 #define BUFFSIZE 256
 
-TcpServer::TcpServer(std::wstring port, int maxClients)
+int TcpServer::maxClients;
+volatile int TcpServer::currClients;
+std::wstring TcpServer::currDir;
+
+TcpServer::TcpServer(std::wstring port, int maxClients, std::wstring currDir)
 {
 	this->port = port;
-
+	this->currDir = currDir;
 	if (maxClients > 0)
 		this->maxClients = maxClients;
 	else
@@ -81,7 +85,7 @@ unsigned TcpServer::AcceptThreadRoutine(void* instance)
 	std::cout << "Listening for connections..." << std::endl;
 	TcpServer* server = (TcpServer *)instance;
 	SOCKET client = INVALID_SOCKET;
-	while (client = accept(server->listenSocket, (sockaddr *)NULL, NULL))
+	while ((client = accept(server->listenSocket, (sockaddr *)NULL, NULL)) && server->listenSocket != INVALID_SOCKET)
 	{
 		while (currClients >= maxClients)
 			Sleep(1000);
@@ -113,15 +117,17 @@ unsigned TcpServer::ClientThreadRoutine(void* clientSocket)
 	wchar_t ip[INET_ADDRSTRLEN];
 	InetNtopW(AF_INET, &(client_info.sin_addr), ip, INET_ADDRSTRLEN);
 	
-	FileService fileService(L"/logs", ip);
+	FileService fileService(currDir, ip);
 
-	wchar_t buff[BUFFSIZE] = { 0 };
-	while (recv(client, (char *)buff, BUFFSIZE * 2, 0) > 0)
+	wchar_t buff[BUFFSIZE + 1] = { 0 };
+	int bytesRecieved = 0;
+	while ((bytesRecieved = recv(client, (char *)buff, BUFFSIZE * 2, 0)) > 0)
 	{
 		fileService.Append(buff);
 		ZeroMemory(buff, BUFFSIZE);
 		std::cout << "Recieved data from client [" << client << "]." << std::endl;
 	}
+	int errorcode = WSAGetLastError();
 	std::cout << "Client [" << client << "] has disconnected." << std::endl;
 	closesocket(client);
 	return 0;

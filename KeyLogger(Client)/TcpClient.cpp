@@ -1,5 +1,6 @@
 #include "TcpClient.h"
 
+
 TcpClient::TcpClient(std::wstring ipAddr, std::wstring port, int buffSize)
 {
 	this->ipAddr = ipAddr;
@@ -17,7 +18,7 @@ BOOLEAN TcpClient::Connect(std::wstring ipAddr, std::wstring port)
 	if (ipAddr.empty())
 		ipAddr = this->ipAddr;
 	if (port.empty())
-		ipAddr = this->port;
+		port = this->port;
 
 	if (WSAStartup(MAKEWORD(2, 2), &wsaData))
 		return FALSE;

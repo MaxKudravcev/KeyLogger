@@ -1,21 +1,24 @@
 #include "FileService.h"
+#define _CRT_SECURE_NO_WARNINGS 
+
 
 FileService::FileService(std::wstring logDirectory, std::wstring fileName)
 {	
-	if (CreateDirectoryW(logDirectory.c_str(), NULL) || GetLastError() == ERROR_ALREADY_EXISTS)
-		fileName = logDirectory + L"/" + fileName + L"_" + CurrentDateTime() + L".log";
-	else
-		fileName = fileName + L"_" + CurrentDateTime() + L".log";
-	
-	fout.open(fileName, std::ios_base::out || std::ios_base::app);
+	fileName = fileName + L'_' + CurrentDateTime() + L".log";
+	if (CreateDirectory(logDirectory.c_str(), NULL) || ERROR_ALREADY_EXISTS == GetLastError())
+
+	{
+		this->fout.open(logDirectory.append(fileName), std::ofstream::out | std::ofstream::app);
+	}
 }
 
 std::wstring FileService::CurrentDateTime() {
 	auto t = std::time(nullptr);
-	auto tm = *std::localtime(&t);
+	tm t_m;
+	localtime_s(&t_m, &t);
 
 	std::wostringstream oss;
-	oss << std::put_time(&tm, "%d-%m-%Y_%H-%M-%S");
+	oss << std::put_time(&t_m, L"%d-%m-%Y_%H-%M-%S");
 	std::wstring str = oss.str();
 	return str;
 }

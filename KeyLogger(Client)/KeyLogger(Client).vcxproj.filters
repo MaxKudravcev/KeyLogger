@@ -24,10 +24,10 @@
     <ClCompile Include="TcpClient.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="Concealment.cpp">
+    <ClCompile Include="Filters.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="Filters.cpp">
+    <ClCompile Include="Concealment.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>

